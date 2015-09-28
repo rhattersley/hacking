@@ -18,15 +18,30 @@
     >>> type(times[0])
     Datetime360
 
-    #>>> a = Array([1, 2.2], dtype=Float(32, endian='little'))
-    #>>> a
-    #array([1.0, 2.2], dtype=Float32(32, 'little'))
-    #>>> a[0]
-    #1.0
-    #>>> type(a[0])
-    #Float32
+    Parameterised types (e.g. categoricals, custom calendars, physical units)
+    need a new class for each set of parameters.
+    => Need a factory function that builds classes at runtime.
+
+    categories = Array(['a', 'b', 'c', 'a'], dtype=categories('abc'))
+
+    TODO: Physical units should have an underlying dtype?
+        e.g. Unit(Float32, 'm.s-1')
+
+        Would/should there be anything to stop you doing something odd like:
+            Unit(Datetime360, 'm.s-1')
+        or:
+            Unit(Unit(Float32, 'm'), 's')
+        A class hierarchy with Number in the mix?
+
+    >>> speeds = Array([1, 2.5], dtype=Unit('m.s-1'))
+    >>> speeds
+    Array([1.0, 2.5], dtype=Unit('m.s-1'))
+    >>> mag = speeds * speeds
+    >>> mag
+    Array([1.0, 6.25], dtype=Unit('m2.s-2'))
 
 """
+import struct
 
 import numpy as np
 
@@ -35,6 +50,9 @@ class Array(object):
     def __init__(self, values, dtype):
         self._packed_values = [dtype.pack(v) for v in values]
         self.dtype = dtype
+
+    def __len__(self):
+        return len(self._packed_values)
 
     def __repr__(self):
         values = [str(self.dtype.unpack(pv)) for pv in self._packed_values]
@@ -46,27 +64,31 @@ class Array(object):
             result = self.dtype.unpack(result)
         return result
 
+    def __mul__(self, other):
+        values = []
+        for i in range(len(self)):
+            values.append(self[i] * other[i])
+        return Array(values, self.dtype * other.dtype)
 
-class DtypeMeta(type):
+
+class DTypeMeta(type):
     def __repr__(cls):
         return cls.__name__
 
 
 class DType(object):
-    __metaclass__ = DtypeMeta
+    __metaclass__ = DTypeMeta
 
 
 class Float32(DType):
     @classmethod
-    def pack(self, value):
+    def pack(cls, value):
         """Return the bytes corresponding to a Python object."""
-        import struct
         return struct.pack('f', float(value))
 
     # Make a new instance from a packed representation.
     @classmethod
     def unpack(cls, packed_value):
-        import struct
         value, = struct.unpack('f', packed_value)
         return cls(value)
 
@@ -83,13 +105,11 @@ class Datetime360(DType):
         """Return the bytes corresponding to a Python object."""
         date, _ = value.split('T')
         year, month, day = map(int, date.split('-'))
-        import struct
         return struct.pack('l', (year*12 + (month-1))*30 + (day-1))
 
     # Make a new instance from a packed representation.
     @classmethod
     def unpack(cls, packed_value):
-        import struct
         days, = struct.unpack('l', packed_value)
         day = days % 30 + 1
         month = days // 30 % 12 + 1
@@ -105,3 +125,47 @@ class Datetime360(DType):
 
     def __repr__(self):
         return 'Datetime360({})'.format(self._value)
+
+
+class UnitMeta(DTypeMeta):
+    def __repr__(cls):
+        return '{}({!r})'.format(cls.__name__, cls._unit)
+
+    def __mul__(cls1, cls2):
+        def bits(unit):
+            import collections
+            us = collections.Counter()
+            for u in unit.split('.'):
+                n = int(u[1:]) if u[1:] else 1
+                us[u[0]] = n
+            return us
+        b1 = bits(cls1._unit)
+        b2 = bits(cls2._unit)
+        b1.update(b2)
+        u = '.'.join(k + str(b1[k]) for k in sorted(b1.keys()))
+        return Unit(u)
+
+
+def Unit(unit):
+    class Unit(DType):
+        __metaclass__ = UnitMeta
+        _unit = unit
+        @classmethod
+        def pack(cls, value):
+            return struct.pack('f', float(value))
+
+        @classmethod
+        def unpack(cls, packed_value):
+            value, = struct.unpack('f', packed_value)
+            return cls(value)
+
+        def __init__(self, value):
+            self.value = value
+
+        def __repr__(self):
+            return repr(self.value)
+
+        def __mul__(self, other):
+            return self.value * other.value
+
+    return Unit
