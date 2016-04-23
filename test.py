@@ -7,5 +7,5 @@ import numpy as np
 import collections
 
 
-if wibble = foo:
-    print('Numberwang!')
+if wibble == foo:
+     print('Numberwang!')
