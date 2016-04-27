@@ -43,30 +43,32 @@ h|Position h|Value
 
 .2+h|Dimension
 h|Position
-|
- ```python
- # No change
- cube[:, 2]
- cube.iloc[:, 2]
- ```
-|
- ```python
- cube.loc[:, 1.5]
- ```
+
+a|[source,python]
+----
+cube[:, 2]  # No change
+cube.iloc[:, 2]
+----
+
+a|[source,python]
+----
+cube.loc[:, 1.5]
+----
 
 h|Name
-|
- ```python
- cube[dict(height=2)]
- cube.iloc[dict(height=2)]
- cube.iloc(height=2)
- ```
 
-|
- ```python
- cube.loc[dict(height=1.5)]
- cube.loc(height=1.5)
- ```
+a|[source,python]
+----
+cube[dict(height=2)]
+cube.iloc[dict(height=2)]
+cube.iloc(height=2)
+----
+
+a|[source,python]
+----
+cube.loc[dict(height=1.5)]
+cube.loc(height=1.5)
+----
 |===
 
 ### xarray style
@@ -79,28 +81,30 @@ h|Position h|Value
 
 .2+h|Dimension
 h|Position
-|
- ```python
- # No change
- cube[:, 2]
- ```
-|
- ```python
- cube.loc[:, 1.5]
- ```
+
+a|[source,python]
+----
+cube[:, 2]  # No change
+----
+
+a|[source,python]
+----
+cube.loc[:, 1.5]
+----
 
 h|Name
-|
- ```python
+
+a|[source,python]
+----
  cube[dict(height=2)]
  cube.isel(height=2)
- ```
+----
 
-|
- ```python
- cube.loc[dict(height=1.5)]
- cube.sel(height=1.5)
- ```
+a|[source,python]
+----
+cube.loc[dict(height=1.5)]
+cube.sel(height=1.5)
+----
 |===
 
 ### TODO
