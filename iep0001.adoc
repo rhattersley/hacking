@@ -130,6 +130,7 @@ cube.sel(height=1.5)
 ** e.g. Rich Signell's xarray/iris comparison.footnoteref:[xarray,http://nbviewer.jupyter.org/gist/rsignell-usgs/13d7ce9d95fddb4983d4cbf98be6c71d]
 * Performance
 ** e.g. Rich Signell's xarray/iris comparison.footnoteref:[xarray]
+** e.g. A made up thing.footnoteref:[thing,http://thing.com/]
 
 ## References
 . Iris
