@@ -3,11 +3,12 @@
 ## Background
 
 Currently, to select a subset of a Cube based on coordinate values we use something like:
-```python
+[source,python]
+----
 cube.extract(iris.Constraint(realization=3,
                              model_level_number=[1, 5],
                              latitude=lambda cell: 40 <= cell <= 60))
-```
+----
 On the plus side, this works irrespective of the dimension order of the data, but the drawbacks with this form of indexing include:
 
 * It uses a completely different syntax to position-based indexing, e.g. `cube[4, 0:6]`.
@@ -15,16 +16,18 @@ On the plus side, this works irrespective of the dimension order of the data, bu
 * It is long-winded.
 
 Similarly, to select a subset of a Cube using positional indices but where the dimension is unknown has no standard syntax _at all_! Instead it requires code akin to:
-```python
+[source,python]
+----
 key = [slice(None)] * cube.ndim
 key[cube.coord_dims('model_level_number')[0]] = slice(3, 9, 2)
 cube[tuple(key)]
-```
+----
 
 The only form of indexing that is well supported is indexing by position where the dimension order is known:
-```python
+[source,python]
+----
 cube[4, 0:6, 30:]
-```
+----
 
 ## Proposal
 
