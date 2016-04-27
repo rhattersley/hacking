@@ -127,7 +127,9 @@ cube.sel(height=1.5)
 *** xarray supports (several) nearest-neighbour schemes via http://xarray.pydata.org/en/stable/indexing.html#nearest-neighbor-lookups[`data.sel()`]
 *** Apparently http://holoviews.org/[holoviews] does nearest-neighbour interpolation.
 * Time handling
-** e.g. Rich Signell's http://nbviewer.jupyter.org/gist/rsignell-usgs/13d7ce9d95fddb4983d4cbf98be6c71d[xarray/iris comparison]
+** e.g. Rich Signell's xarray/iris comparison.footnoteref:[xarray,http://nbviewer.jupyter.org/gist/rsignell-usgs/13d7ce9d95fddb4983d4cbf98be6c71d]
+* Performance
+** e.g. Rich Signell's xarray/iris comparison.footnoteref:[xarray]
 
 ## References
 . Iris
